@@ -1,0 +1,6 @@
+
+Liquibase plugin for sbt 0.10+
+
+It is based off the sbt-liquibase plugin for sbt 0.7 and the grails liquibase plugin
+
+It isn't quite ready for use. I will include instructions when it is ready for use.
