@@ -7,6 +7,7 @@ import Process._
 import Keys._
 
 import java.io.{File, PrintStream}
+import java.text.SimpleDateFormat
 
 import liquibase.integration.commandline.CommandLineUtils
 import liquibase.resource.FileSystemResourceAccessor
@@ -14,7 +15,8 @@ import liquibase.database.Database
 import liquibase.Liquibase
 
 object LiquibasePlugin extends Plugin {
-  val liquibaseConfig = config("liquibase")
+
+  val dateFormat = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss")
 
   val liquibaseUpdate = TaskKey[Unit]("liquibase-update", "Run a liquibase migration")
   val liquibaseStatus = TaskKey[Unit]("liquibase-status", "Print count of unrun change sets")
@@ -23,7 +25,7 @@ object LiquibasePlugin extends Plugin {
   val liquibaseReleaseLocks   = TaskKey[Unit]("liquibase-release-locks", "Releases all locks on the database changelog")
   val liquibaseValidateChangelog = TaskKey[Unit]("liquibase-validate-changelog", "Checks changelog for errors")
   val liquibaseTag = InputKey[Unit]("liquibase-tag", "Tags the current database state for future rollback")
-  val liquibaseDbDiff = TaskKey[Unit]("liquibase-db-diff", "Generate changeSet(s) to make Test DB match Development")
+  val liquibaseDbDiff = TaskKey[Unit]("liquibase-db-diff", "( this isn't implemented yet ) Generate changeSet(s) to make Test DB match Development")
   val liquibaseDbDoc = TaskKey[Unit]("liquibase-db-doc", "Generates Javadoc-like documentation based on current database and change log")
   val liquibaseGenerateChangelog = TaskKey[Unit]("liquibase-generate-changelog", "Writes Change Log XML to copy the current state of the database to standard out")
   val liquibaseChangelogSyncSql = TaskKey[Unit]("liquibase-changelog-sync-sql", "Writes SQL to mark all changes as executed in the database to STDOUT")
@@ -67,11 +69,67 @@ object LiquibasePlugin extends Plugin {
     liquibaseReleaseLocks <<= (streams, liquibase) map { (out, lbase) => lbase.forceReleaseLocks() },
     liquibaseValidateChangelog <<= (streams, liquibase) map { (out, lbase) => lbase.validate() },
     liquibaseDbDoc <<= ( streams, liquibase, target ) map { ( out, lbase, tdir ) =>
-      lbase.generateDocumentation( tdir / "liquibase-doc" )
-      out.log("Documentation generated in %s".format( tdir / "liquibase-doc" absolutePath ) },
-    //liquibaseGenerateChangelog <<= (streams, liquibase, changelog ) map { (out, lbase, clog) =>  }
-    // liquibaseTag
-    // liquibaseDbDiff <<=
+      lbase.generateDocumentation( tdir / "liquibase-doc" absolutePath )
+      out.log("Documentation generated in %s".format( tdir / "liquibase-doc" absolutePath )) },
+
+    liquibaseRollback <<= inputTask { (argTask) =>
+      ( streams, liquibase, argTask ) map { ( out, lbase, args :Seq[String] ) =>
+        lbase.rollback( args.head , null )
+        out.log("Rolled back to tag %s".format(args.head))
+      }
+    },
+
+    liquibaseRollbackCount <<= inputTask { (argTask) =>
+      ( streams, liquibase, argTask ) map { ( out, lbase, args :Seq[String] ) =>
+        lbase.rollback( args.head.toInt , null )
+        out.log("Rolled back to count %s".format(args.head))
+      }
+    },
+
+    liquibaseRollbackSql <<= inputTask { (argTask) =>
+      ( streams, liquibase, argTask ) map { ( out, lbase, args :Seq[String] ) =>
+        lbase.rollback( args.head , null, out.text() )
+      }
+    },
+
+    liquibaseRollbackCountSql <<= inputTask { (argTask) =>
+      ( streams, liquibase, argTask ) map { ( out, lbase, args :Seq[String] ) =>
+        lbase.rollback( args.head.toInt , null, out.text() )
+      }
+    },
+
+    liquibaseRollbackToDate <<= inputTask { (argTask) =>
+      ( streams, liquibase, argTask ) map { ( out, lbase, args :Seq[String] ) =>
+        lbase.rollback( dateFormat.parse( args.mkString(" ") ) , null )
+      }
+    },
+
+    liquibaseRollbackToDateSql <<= inputTask { (argTask) =>
+      ( streams, liquibase, argTask ) map { ( out, lbase, args :Seq[String] ) =>
+        lbase.rollback( dateFormat.parse(args.mkString(" ")) , null, out.text() )
+      }
+    },
+
+    liquibaseFutureRollbackSql <<= inputTask { (argTask) =>
+      ( streams, liquibase, argTask ) map { ( out, lbase, args :Seq[String] ) =>
+        lbase.futureRollbackSQL( null, out.text() )
+      }
+    },
+
+    liquibaseTag <<= inputTask { (argTask) =>
+      (streams, liquibase, argTask) map { (out, lbase, args :Seq[String] ) =>
+        lbase.tag(args.head)
+        out.log("Tagged db with %s for future rollback if needed".format(args.head))
+      }
+    },
+
+    liquibaseGenerateChangelog <<= (streams, liquibase, changelog, liquibaseDefaultSchemaName, baseDirectory) map { (out, lbase, clog, sname, bdir) =>
+      CommandLineUtils.doGenerateChangeLog(clog, lbase.getDatabase(), sname, null,null,null, bdir / "src" / "main" / "migrations" absolutePath )
+    },
+
+    liquibaseChangelogSyncSql <<= (streams, liquibase ) map { ( out, lbase) =>
+      lbase.changeLogSync(null, out.text())
+    }
   )
 
   /*private def updateTask = {
