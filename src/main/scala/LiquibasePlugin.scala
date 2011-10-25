@@ -16,7 +16,7 @@ import liquibase.Liquibase
 
 object LiquibasePlugin extends Plugin {
 
-  val dateFormat = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss")
+  val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
   val liquibaseUpdate = TaskKey[Unit]("liquibase-update", "Run a liquibase migration")
   val liquibaseStatus = TaskKey[Unit]("liquibase-status", "Print count of unrun change sets")
@@ -54,7 +54,8 @@ object LiquibasePlugin extends Plugin {
 
   liquibaseDatabase <<= (liquibaseUrl, liquibaseUsername, liquibasePassword, liquibaseDriver, liquibaseDefaultSchemaName, fullClasspath in Runtime ) map {
     (url :String, uname :String, pass :String, driver :String, schemaName :String, cpath ) =>
-      CommandLineUtils.createDatabaseObject( ClasspathUtilities.toLoader(cpath.map(_.data)) ,url, uname, pass, driver, schemaName, null,null)
+      //CommandLineUtils.createDatabaseObject( ClasspathUtilities.toLoader(cpath.map(_.data)) ,url, uname, pass, driver, schemaName, null,null)
+      CommandLineUtils.createDatabaseObject( ClasspathUtilities.toLoader(cpath.map(_.data)) ,url, uname, pass, driver, null, null,null)
   },
 
   liquibase <<= ( changelog, liquibaseDatabase ) map {
@@ -124,7 +125,8 @@ object LiquibasePlugin extends Plugin {
     },
 
     liquibaseGenerateChangelog <<= (streams, liquibase, changelog, liquibaseDefaultSchemaName, baseDirectory) map { (out, lbase, clog, sname, bdir) =>
-      CommandLineUtils.doGenerateChangeLog(clog, lbase.getDatabase(), sname, null,null,null, bdir / "src" / "main" / "migrations" absolutePath )
+      //CommandLineUtils.doGenerateChangeLog(clog, lbase.getDatabase(), sname, null,null,null, bdir / "src" / "main" / "migrations" absolutePath )
+      CommandLineUtils.doGenerateChangeLog(clog, lbase.getDatabase(), null, null,null,null, bdir / "src" / "main" / "migrations" absolutePath )
     },
 
     liquibaseChangelogSyncSql <<= (streams, liquibase ) map { ( out, lbase) =>
