@@ -5,7 +5,7 @@ organization := "atd"
 
 name := "sbt-liquibase"
 
-version := "0.2"
+version := "0.3"
 
 libraryDependencies += "org.liquibase" % "liquibase-core" % "2.0.2"
 
