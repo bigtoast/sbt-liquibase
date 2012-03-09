@@ -1,5 +1,0 @@
-[0m[[0minfo[0m] [0m:: delivering :: atd#sbt-liquibase;0.4 :: 0.4 :: release :: Thu Mar 08 17:05:10 PST 2012[0m
-[0m[[0mdebug[0m] [0m	options = status=release pubdate=Thu Mar 08 17:05:10 PST 2012 validate=true resolveDynamicRevisions=true merge=true resolveId=null pubBranch=null[0m
-[0m[[0mdebug[0m] [0mpost 1.3 ivy file: using exact as default matcher[0m
-[0m[[0minfo[0m] [0m	delivering ivy file to /Users/andrew/Projects/BigToast/sbt-liquibase/target/scala-2.9.1/sbt-0.11.2/ivy-0.4.xml[0m
-[0m[[0mdebug[0m] [0m	deliver done (28ms)[0m

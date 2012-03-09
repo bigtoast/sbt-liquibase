@@ -1,1 +1,0 @@
-Index.PACKAGES = {"atd" : [], "atd.sbtliquibase" : [{"object" : "atd\/sbtliquibase\/LiquibasePlugin$.html", "name" : "atd.sbtliquibase.LiquibasePlugin"}]};
