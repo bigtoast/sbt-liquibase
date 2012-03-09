@@ -38,11 +38,11 @@ object LiquibasePlugin extends Plugin {
   val liquibaseRollbackToDateSql = InputKey[Unit]("liquibase-rollback-to-date-sql", "<date> Writes SQL to roll back the database to that state it was in at the given date/time version to STDOUT")
   val liquibaseFutureRollbackSql = InputKey[Unit]("liquibase-future-rollback-sql", " Writes SQL to roll back the database to the current state after the changes in the changelog have been applied")
 
-  val changelog         = SettingKey[String]("changelog-path", "The path to where your changelog script lives")
-  val liquibaseUrl      = SettingKey[String]("liquibase-url", "The url for liquibase")
-  val liquibaseUsername = SettingKey[String]("liquibase-username", "username yo.")
-  val liquibasePassword = SettingKey[String]("liquibase-password", "password")
-  val liquibaseDriver   = SettingKey[String]("liquibase-driver", "driver")
+  val liquibaseChangelog = SettingKey[String]("liquibase-changelog", "This is your liquibase changelog file to run.")
+  val liquibaseUrl       = SettingKey[String]("liquibase-url", "The url for liquibase")
+  val liquibaseUsername  = SettingKey[String]("liquibase-username", "username yo.")
+  val liquibasePassword  = SettingKey[String]("liquibase-password", "password")
+  val liquibaseDriver    = SettingKey[String]("liquibase-driver", "driver")
   val liquibaseDefaultSchemaName = SettingKey[String]("liquibase-default-schema-name","default schema name")
 
   lazy val liquibaseDatabase = TaskKey[Database]("liquibase-database", "the database")
@@ -50,7 +50,9 @@ object LiquibasePlugin extends Plugin {
 
   lazy val liquibaseSettings :Seq[Setting[_]] = Seq[Setting[_]](
     liquibaseDefaultSchemaName := "liquischema",
-    changelog <<= baseDirectory( _ / "src" / "main" / "migrations" /  "changelog.xml" absolutePath ),
+    liquibaseChangelog := "src/main/migrations/changelog.xml",
+    //changelog <<= baseDirectory( _ / "src" / "main" / "migrations" /  "changelog.xml" absolutePath ),
+
 
   liquibaseDatabase <<= (liquibaseUrl, liquibaseUsername, liquibasePassword, liquibaseDriver, liquibaseDefaultSchemaName, fullClasspath in Runtime ) map {
     (url :String, uname :String, pass :String, driver :String, schemaName :String, cpath ) =>
@@ -58,7 +60,7 @@ object LiquibasePlugin extends Plugin {
       CommandLineUtils.createDatabaseObject( ClasspathUtilities.toLoader(cpath.map(_.data)) ,url, uname, pass, driver, null, null,null)
   },
 
-  liquibase <<= ( changelog, liquibaseDatabase ) map {
+  liquibase <<= ( liquibaseChangelog, liquibaseDatabase ) map {
     ( cLog :String, dBase :Database ) =>
       new Liquibase( cLog, new FileSystemResourceAccessor, dBase )
   },
@@ -124,7 +126,7 @@ object LiquibasePlugin extends Plugin {
       }
     },
 
-    liquibaseGenerateChangelog <<= (streams, liquibase, changelog, liquibaseDefaultSchemaName, baseDirectory) map { (out, lbase, clog, sname, bdir) =>
+    liquibaseGenerateChangelog <<= (streams, liquibase, liquibaseChangelog, liquibaseDefaultSchemaName, baseDirectory) map { (out, lbase, clog, sname, bdir) =>
       //CommandLineUtils.doGenerateChangeLog(clog, lbase.getDatabase(), sname, null,null,null, bdir / "src" / "main" / "migrations" absolutePath )
       CommandLineUtils.doGenerateChangeLog(clog, lbase.getDatabase(), null, null,null,null, bdir / "src" / "main" / "migrations" absolutePath )
     },
@@ -134,14 +136,5 @@ object LiquibasePlugin extends Plugin {
     }
   )
 
-  /*private def updateTask = {
-    try {
-      liquibase.update(null)
-    } catch {
-      case _ =>
-    } finally {
-      liquibase.getDatabase.getConnection.close
-    }
-  }*/
 
 }

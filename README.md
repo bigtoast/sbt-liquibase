@@ -1,22 +1,16 @@
-Liquibase plugin for sbt 0.10+ and 0.11+
+Liquibase plugin for sbt 0.11+
 ====================================
 
 # Instructions for use:
 ### Step 1: Include the plugin in your build
 
-Add the following to your `project/plugins/build.sbt`:
-
-## sbt-0.10.1
-
-    resolvers += "bigtoast-github" at "http://bigtoast.github.com/repo/"
-
-    libraryDependencies += "atd" %% "sbt-liquibase" % "0.2"
+Add the following to your `project/plugins.sbt`:
 
 ## sbt-0.11.0
 
     resolvers += "bigtoast-github" at "http://bigtoast.github.com/repo/"
 
-    addSbtPlugin("atd" % "sbt-liquibase" % "0.2")
+    addSbtPlugin("atd" % "sbt-liquibase" % "0.4")
 
 ### Step 2: Add sbt-liquibase settings to your build
 
@@ -26,6 +20,14 @@ Add the following to your 'build.sbt' ( if you are using build.sbt )
     import atd.sbtliquibase.LiquibasePlugin
 
     seq(LiquibasePlugin.liquibaseSettings: _*)
+    
+    liquibaseUsername := ""
+
+    liquibasePassword := ""
+                        
+    liquibaseDriver   := "com.mysql.jdbc.Driver"
+                        
+    liquibaseUrl      := "jdbc:mysql://localhost:3306/test_db?createDatabaseIfNotExist=true"
 
 Or if you are using a build object extending from Build:
 
@@ -91,12 +93,12 @@ Or if you are using a build object extending from Build:
 
         </td></tr>
         <tr>
-                <td> <b>changelog</b> </td>
+                <td> <b>liquibaseChangelog</b> </td>
                 <td>Full path to your changelog file. This defaults 'src/main/migrations/changelog.xml'.</td>
         </tr>
         <tr><td></td><td>
 
-            changelog <<= baseDirectory( _ / "other" / "path" / "dbchanges.xml" absolutePath )
+            liquibaseChangelog := "other/path/dbchanges.xml"
 
         </td></tr>
 </table>
@@ -182,9 +184,14 @@ Or if you are using a build object extending from Build:
 </table>
 
 
-Warnings and Notes
+Notes
 ------------------
-I needed liquibase in an sbt project and after a little encouragement from a recent BASE (Bay Area Scala Enthusiasts) meeting I thought I would hack it out. Hence, this plugin is still at the alpha stage of development. I have used the update and generate changelog tasks in a production environment. The other tasks have only been used in a test environment. There is not much error handling. This is my first sbt plugin and I was focusing on functionality.
+I needed liquibase in an sbt project and after a little encouragement from a recent BASE (Bay Area Scala Enthusiasts) meeting I thought 
+I would hack it out. We have been using it in production for a few months now and haven't had any real problems other than to make 
+sure that the changelog path is relative ( which it is by default ). The reason for using a relative path is that liquibase stores the 
+path to the changelog in the DATABASECHANGELOG table and the path is used to detect if a changelog has already been run. If you use absolute
+paths and then run your migrations from somewhere else on your computer ( you moved your project for example ) the migration will fail because
+liquibase will try to run the same migrations again.
 
 If any bugs are found or features wanted please file an issue in the github project. I will do my best to accommodate.
 

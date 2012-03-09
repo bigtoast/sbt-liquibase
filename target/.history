@@ -1,0 +1,16 @@
+tasks
+eclipse
+reload
+reload plugins
+eclipse
+KK
+EXIT
+exit
+clean
+publish-local
+clean
+reload
+inspect version
+compile
+publish
+exit
