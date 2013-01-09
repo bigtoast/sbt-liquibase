@@ -45,6 +45,7 @@ object LiquibasePlugin extends Plugin {
   val liquibasePassword  = SettingKey[String]("liquibase-password", "password")
   val liquibaseDriver    = SettingKey[String]("liquibase-driver", "driver")
   val liquibaseDefaultSchemaName = SettingKey[String]("liquibase-default-schema-name","default schema name")
+  val liquibaseContext = SettingKey[String]("liquibase-context","changeSet contexts to execute")
 
   lazy val liquibaseDatabase = TaskKey[Database]("liquibase-database", "the database")
   lazy val liquibase = TaskKey[Liquibase]("liquibase", "liquibase object")
@@ -52,6 +53,7 @@ object LiquibasePlugin extends Plugin {
   lazy val liquibaseSettings :Seq[Setting[_]] = Seq[Setting[_]](
     liquibaseDefaultSchemaName := "liquischema",
     liquibaseChangelog := "src/main/migrations/changelog.xml",
+    liquibaseContext := "",
     //changelog <<= baseDirectory( _ / "src" / "main" / "migrations" /  "changelog.xml" absolutePath ),
 
 
@@ -66,7 +68,11 @@ object LiquibasePlugin extends Plugin {
       new Liquibase( cLog, new FileSystemResourceAccessor, dBase )
   },
 
-    liquibaseUpdate <<= liquibase map { _.update(null) },
+    liquibaseUpdate <<= (liquibase, liquibaseContext) map {
+      (liquibase:Liquibase, context:String) =>
+        liquibase.update(context)
+    },
+
     liquibaseStatus <<= liquibase map { _.reportStatus(true, null, new LoggerWriter( ConsoleLogger() ) ) },
     liquibaseClearChecksums <<= liquibase map { _.clearCheckSums() },
     liquibaseListLocks <<= (streams, liquibase) map { (out, lbase) => lbase.reportLocks( new PrintStream(out.binary()) )  },
