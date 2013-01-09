@@ -29,6 +29,7 @@ object LiquibasePlugin extends Plugin {
   val liquibaseDbDoc = TaskKey[Unit]("liquibase-db-doc", "Generates Javadoc-like documentation based on current database and change log")
   val liquibaseGenerateChangelog = TaskKey[Unit]("liquibase-generate-changelog", "Writes Change Log XML to copy the current state of the database to standard out")
   val liquibaseChangelogSyncSql = TaskKey[Unit]("liquibase-changelog-sync-sql", "Writes SQL to mark all changes as executed in the database to STDOUT")
+  val liquibaseDropAll = TaskKey[Unit]("liquibase-drop-all", "Drop all database objects owned by user")
 
   val liquibaseRollback          = InputKey[Unit]("liquibase-rollback", "<tag> Rolls back the database to the the state is was when the tag was applied")
   val liquibaseRollbackSql       = InputKey[Unit]("liquibase-rollback-sql", "<tag> Writes SQL to roll back the database to that state it was in when the tag was applied to STDOUT")
@@ -44,6 +45,7 @@ object LiquibasePlugin extends Plugin {
   val liquibasePassword  = SettingKey[String]("liquibase-password", "password")
   val liquibaseDriver    = SettingKey[String]("liquibase-driver", "driver")
   val liquibaseDefaultSchemaName = SettingKey[String]("liquibase-default-schema-name","default schema name")
+  val liquibaseContext = SettingKey[String]("liquibase-context","changeSet contexts to execute")
 
   lazy val liquibaseDatabase = TaskKey[Database]("liquibase-database", "the database")
   lazy val liquibase = TaskKey[Liquibase]("liquibase", "liquibase object")
@@ -51,6 +53,7 @@ object LiquibasePlugin extends Plugin {
   lazy val liquibaseSettings :Seq[Setting[_]] = Seq[Setting[_]](
     liquibaseDefaultSchemaName := "liquischema",
     liquibaseChangelog := "src/main/migrations/changelog.xml",
+    liquibaseContext := "",
     //changelog <<= baseDirectory( _ / "src" / "main" / "migrations" /  "changelog.xml" absolutePath ),
 
 
@@ -65,7 +68,11 @@ object LiquibasePlugin extends Plugin {
       new Liquibase( cLog, new FileSystemResourceAccessor, dBase )
   },
 
-    liquibaseUpdate <<= liquibase map { _.update(null) },
+    liquibaseUpdate <<= (liquibase, liquibaseContext) map {
+      (liquibase:Liquibase, context:String) =>
+        liquibase.update(context)
+    },
+
     liquibaseStatus <<= liquibase map { _.reportStatus(true, null, new LoggerWriter( ConsoleLogger() ) ) },
     liquibaseClearChecksums <<= liquibase map { _.clearCheckSums() },
     liquibaseListLocks <<= (streams, liquibase) map { (out, lbase) => lbase.reportLocks( new PrintStream(out.binary()) )  },
@@ -133,7 +140,9 @@ object LiquibasePlugin extends Plugin {
 
     liquibaseChangelogSyncSql <<= (streams, liquibase ) map { ( out, lbase) =>
       lbase.changeLogSync(null, out.text())
-    }
+    },
+
+    liquibaseDropAll <<= liquibase map { _.dropAll() }
   )
 
 
