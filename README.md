@@ -6,11 +6,11 @@ Liquibase plugin for sbt 0.11+
 
 Add the following to your `project/plugins.sbt`:
 
-## sbt-0.11.0
+## sbt-0.11.2 / 0.12.1 
 
     resolvers += "bigtoast-github" at "http://bigtoast.github.com/repo/"
 
-    addSbtPlugin("atd" % "sbt-liquibase" % "0.4")
+    addSbtPlugin("com.github.bigtoast" % "sbt-liquibase" % "0.5")
 
 ### Step 2: Add sbt-liquibase settings to your build
 

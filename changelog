@@ -1,0 +1,7 @@
+
+[2013-01-09]
+0.5
+  * merged in commit from rfranco
+  * changed group to com.github.bigtoast
+  * upped sbt to 12.1
+  * cross built with 2.9.2 and 2.10

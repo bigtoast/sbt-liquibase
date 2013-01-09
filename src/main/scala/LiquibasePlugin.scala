@@ -1,5 +1,5 @@
 
-package atd.sbtliquibase
+package com.github.bigtoast.sbtliquibase
 
 import sbt._
 import classpath._
@@ -18,18 +18,18 @@ object LiquibasePlugin extends Plugin {
 
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
-  val liquibaseUpdate = TaskKey[Unit]("liquibase-update", "Run a liquibase migration")
-  val liquibaseStatus = TaskKey[Unit]("liquibase-status", "Print count of unrun change sets")
-  val liquibaseClearChecksums = TaskKey[Unit]("liquibase-clear-checksums", "Removes all saved checksums from database log. Useful for 'MD5Sum Check Failed' errors")
-  val liquibaseListLocks      = TaskKey[Unit]("liquibase-list-locks", "Lists who currently has locks on the database changelog")
-  val liquibaseReleaseLocks   = TaskKey[Unit]("liquibase-release-locks", "Releases all locks on the database changelog")
+  val liquibaseUpdate            = TaskKey[Unit]("liquibase-update", "Run a liquibase migration")
+  val liquibaseStatus            = TaskKey[Unit]("liquibase-status", "Print count of unrun change sets")
+  val liquibaseClearChecksums    = TaskKey[Unit]("liquibase-clear-checksums", "Removes all saved checksums from database log. Useful for 'MD5Sum Check Failed' errors")
+  val liquibaseListLocks         = TaskKey[Unit]("liquibase-list-locks", "Lists who currently has locks on the database changelog")
+  val liquibaseReleaseLocks      = TaskKey[Unit]("liquibase-release-locks", "Releases all locks on the database changelog")
   val liquibaseValidateChangelog = TaskKey[Unit]("liquibase-validate-changelog", "Checks changelog for errors")
-  val liquibaseTag = InputKey[Unit]("liquibase-tag", "Tags the current database state for future rollback")
-  val liquibaseDbDiff = TaskKey[Unit]("liquibase-db-diff", "( this isn't implemented yet ) Generate changeSet(s) to make Test DB match Development")
-  val liquibaseDbDoc = TaskKey[Unit]("liquibase-db-doc", "Generates Javadoc-like documentation based on current database and change log")
+  val liquibaseTag               = InputKey[Unit]("liquibase-tag", "Tags the current database state for future rollback")
+  val liquibaseDbDiff            = TaskKey[Unit]("liquibase-db-diff", "( this isn't implemented yet ) Generate changeSet(s) to make Test DB match Development")
+  val liquibaseDbDoc             = TaskKey[Unit]("liquibase-db-doc", "Generates Javadoc-like documentation based on current database and change log")
   val liquibaseGenerateChangelog = TaskKey[Unit]("liquibase-generate-changelog", "Writes Change Log XML to copy the current state of the database to standard out")
-  val liquibaseChangelogSyncSql = TaskKey[Unit]("liquibase-changelog-sync-sql", "Writes SQL to mark all changes as executed in the database to STDOUT")
-  val liquibaseDropAll = TaskKey[Unit]("liquibase-drop-all", "Drop all database objects owned by user")
+  val liquibaseChangelogSyncSql  = TaskKey[Unit]("liquibase-changelog-sync-sql", "Writes SQL to mark all changes as executed in the database to STDOUT")
+  val liquibaseDropAll           = TaskKey[Unit]("liquibase-drop-all", "Drop all database objects owned by user")
 
   val liquibaseRollback          = InputKey[Unit]("liquibase-rollback", "<tag> Rolls back the database to the the state is was when the tag was applied")
   val liquibaseRollbackSql       = InputKey[Unit]("liquibase-rollback-sql", "<tag> Writes SQL to roll back the database to that state it was in when the tag was applied to STDOUT")
