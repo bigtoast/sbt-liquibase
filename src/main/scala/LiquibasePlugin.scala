@@ -29,6 +29,7 @@ object LiquibasePlugin extends Plugin {
   val liquibaseDbDoc = TaskKey[Unit]("liquibase-db-doc", "Generates Javadoc-like documentation based on current database and change log")
   val liquibaseGenerateChangelog = TaskKey[Unit]("liquibase-generate-changelog", "Writes Change Log XML to copy the current state of the database to standard out")
   val liquibaseChangelogSyncSql = TaskKey[Unit]("liquibase-changelog-sync-sql", "Writes SQL to mark all changes as executed in the database to STDOUT")
+  val liquibaseDropAll = TaskKey[Unit]("liquibase-drop-all", "Drop all database objects owned by user")
 
   val liquibaseRollback          = InputKey[Unit]("liquibase-rollback", "<tag> Rolls back the database to the the state is was when the tag was applied")
   val liquibaseRollbackSql       = InputKey[Unit]("liquibase-rollback-sql", "<tag> Writes SQL to roll back the database to that state it was in when the tag was applied to STDOUT")
@@ -133,7 +134,9 @@ object LiquibasePlugin extends Plugin {
 
     liquibaseChangelogSyncSql <<= (streams, liquibase ) map { ( out, lbase) =>
       lbase.changeLogSync(null, out.text())
-    }
+    },
+
+    liquibaseDropAll <<= liquibase map { _.dropAll() }
   )
 
 
