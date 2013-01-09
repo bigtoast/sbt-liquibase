@@ -1,4 +1,4 @@
-Liquibase plugin for sbt 0.11+
+Liquibase plugin for sbt 0.11 / 0.12
 ====================================
 
 # Instructions for use:
@@ -17,7 +17,7 @@ Add the following to your `project/plugins.sbt`:
 Add the following to your 'build.sbt' ( if you are using build.sbt )
 
 
-    import atd.sbtliquibase.LiquibasePlugin
+    import com.github.bigtoast.sbtliquibase.LiquibasePlugin
 
     seq(LiquibasePlugin.liquibaseSettings: _*)
     
@@ -33,7 +33,7 @@ Or if you are using a build object extending from Build:
 
     import sbt._
     import Keys._
-    import atd.sbtliquibase.LiquibasePlugin._
+    import com.github.bigtoast.sbtliquibase.LiquibasePlugin._
 
     class MyBuildThatHasntDrankTheNoSQLKoolAid extends Build {
          lazy val seniorProject = Project("hola", file("."), settings = Defaults.defaultSettings ++ liquibaseSettings ++ Seq (
@@ -180,6 +180,10 @@ Or if you are using a build object extending from Build:
                 <td><b>liquibase-future-rollback-sql</b></td>
                 <td>Writes SQL to roll back the database to the current state after the changes in the changelog have been applied.</td>
         </tr>
+	<tr>
+		<td><b>liquibase-drop-all</b></td>
+		<td>Drop all tables</td>
+	</tr>
 
 </table>
 

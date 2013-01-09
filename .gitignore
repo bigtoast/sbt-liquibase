@@ -3,5 +3,6 @@ bin
 build
 **/*.class
 *~
+project
 project/target
 .cache
