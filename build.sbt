@@ -7,4 +7,4 @@ name := "sbt-liquibase"
 
 version := "0.5-SNAPSHOT"
 
-libraryDependencies += "org.liquibase" % "liquibasste-core" % "2.0.5"
+libraryDependencies += "org.liquibase" % "liquibase-core" % "2.0.5"
