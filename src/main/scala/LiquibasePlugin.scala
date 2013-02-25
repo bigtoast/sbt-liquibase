@@ -1,4 +1,3 @@
-
 package com.github.bigtoast.sbtliquibase
 
 import sbt._

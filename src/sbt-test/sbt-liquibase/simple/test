@@ -1,0 +1,7 @@
+$ delete target/db/
+> liquibase-db-doc
+$ exists target/liquibase-doc/
+> liquibase-update
+$ exists target/liquibase-doc/
+> liquibase-rollback-count 2
+

@@ -3,7 +3,8 @@ bin
 build
 **/*.class
 *~
-project
+project/project
 project/target
 .cache
 .*
+.DS_Store
