@@ -60,7 +60,7 @@ object LiquibasePlugin extends Plugin {
   liquibaseDatabase <<= (liquibaseUrl, liquibaseUsername, liquibasePassword, liquibaseDriver, liquibaseDefaultSchemaName, fullClasspath in Runtime ) map {
     (url :String, uname :String, pass :String, driver :String, schemaName :String, cpath ) =>
       //CommandLineUtils.createDatabaseObject( ClasspathUtilities.toLoader(cpath.map(_.data)) ,url, uname, pass, driver, schemaName, null,null)
-      CommandLineUtils.createDatabaseObject( ClasspathUtilities.toLoader(cpath.map(_.data)) ,url, uname, pass, driver, null, null,null)
+      CommandLineUtils.createDatabaseObject( ClasspathUtilities.toLoader(cpath.map(_.data)) ,url, uname, pass, driver, null, null, false, false, null, null, null,null)
   },
 
   liquibase <<= ( liquibaseChangelog, liquibaseDatabase ) map {
@@ -135,7 +135,7 @@ object LiquibasePlugin extends Plugin {
 
     liquibaseGenerateChangelog <<= (streams, liquibase, liquibaseChangelog, liquibaseDefaultSchemaName, baseDirectory) map { (out, lbase, clog, sname, bdir) =>
       //CommandLineUtils.doGenerateChangeLog(clog, lbase.getDatabase(), sname, null,null,null, bdir / "src" / "main" / "migrations" absolutePath )
-      CommandLineUtils.doGenerateChangeLog(clog, lbase.getDatabase(), null, null,null,null, bdir / "src" / "main" / "migrations" absolutePath )
+      CommandLineUtils.doGenerateChangeLog(clog, lbase.getDatabase(), null, null, null, null, null, bdir / "src" / "main" / "migrations" absolutePath, null)
     },
 
     liquibaseChangelogSyncSql <<= (streams, liquibase ) map { ( out, lbase) =>
