@@ -19,6 +19,7 @@ object LiquibasePlugin extends Plugin {
   val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
   val liquibaseUpdate            = TaskKey[Unit]("liquibase-update", "Run a liquibase migration")
+  val liquibaseUpdateSql         = TaskKey[Unit]("liquibase-update-sql", "Writes SQL to run a liquibase migration")
   val liquibaseStatus            = TaskKey[Unit]("liquibase-status", "Print count of unrun change sets")
   val liquibaseClearChecksums    = TaskKey[Unit]("liquibase-clear-checksums", "Removes all saved checksums from database log. Useful for 'MD5Sum Check Failed' errors")
   val liquibaseListLocks         = TaskKey[Unit]("liquibase-list-locks", "Lists who currently has locks on the database changelog")
@@ -71,6 +72,11 @@ object LiquibasePlugin extends Plugin {
     liquibaseUpdate <<= (liquibase, liquibaseContext) map {
       (liquibase:Liquibase, context:String) =>
         liquibase.update(context)
+    },
+
+    liquibaseUpdateSql <<= (streams, liquibase, liquibaseContext) map {
+      (out, liquibase: Liquibase, context: String) =>
+        liquibase.update(context, out.text())
     },
 
     liquibaseStatus <<= liquibase map { _.reportStatus(true, null, new LoggerWriter( ConsoleLogger() ) ) },
