@@ -1,11 +1,11 @@
 
 sbtPlugin := true
 
-organization := "ch.becompany"
+organization := "com.github.bigtoast"
 
 name := "sbt-liquibase"
 
-version := "0.6"
+version := "0.5"
 
 crossScalaVersions := Seq("2.9.2", "2.10.0")
 
@@ -13,12 +13,4 @@ libraryDependencies += "org.liquibase" % "liquibase-core" % "3.3.0"
 
 publishMavenStyle := true
 
-credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
-
-publishTo := {
-  val nexus = "http://nexus.becompany.ch/nexus/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots") 
-  else
-    Some("releases"  at nexus + "content/repositories/releases")
-}
+publishTo := Some(Resolver.file("bigtoast.github.com", file(Path.userHome + "/Projects/BigToast/bigtoast.github.com/repo")))
