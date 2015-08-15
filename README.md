@@ -84,12 +84,39 @@ Or if you are using a build object extending from Build:
 
         </td></tr>
         <tr>
-                <td> <b>liquibaseDefaultSchemaName</b> </td>
-                <td>Default schema name for the db if it isn't defined in the uri. This defaults to null.</td>
+                <td> <b>liquibaseChangelogCatalog</b> </td>
+                <td>Default catalog name for the changelog tables. This defaults to None.</td>
         </tr>
         <tr><td></td><td>
 
-            liquibaseDefaultSchemaName := "dbname"
+            liquibaseChangelogCatalog := Some("my_catalog")
+
+        </td></tr>
+        <tr>
+                <td> <b>liquibaseChangelogSchemaName</b> </td>
+                <td>Default schema name for the changelog tables. This defaults to None.</td>
+        </tr>
+        <tr><td></td><td>
+
+            liquibaseChangelogSchemaName := Some("my_schema")
+
+        </td></tr>
+        <tr>
+                <td> <b>liquibaseDefaultCatalog</b> </td>
+                <td>Default catalog name for the db if it isn't defined in the uri. This defaults to None.</td>
+        </tr>
+        <tr><td></td><td>
+
+            liquibaseDefaultCatalog := Some("my_catalog")
+
+        </td></tr>
+        <tr>
+                <td> <b>liquibaseDefaultSchemaName</b> </td>
+                <td>Default schema name for the db if it isn't defined in the uri. This defaults to None.</td>
+        </tr>
+        <tr><td></td><td>
+
+            liquibaseDefaultSchemaName := Some("my_schema")
 
         </td></tr>
         <tr>
