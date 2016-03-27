@@ -7,8 +7,12 @@ name := "sbt-liquibase"
 
 version := "0.6"
 
+scalaVersion := "2.10.4"
+
 crossScalaVersions := Seq("2.11.0")
 
-libraryDependencies += "org.liquibase" % "liquibase-core" % "2.0.5"
+libraryDependencies += "org.liquibase" % "liquibase-core" % "3.4.2"
 
-publishTo := Some(Resolver.file("bigtoast.github.com", file(Path.userHome + "/Projects/BigToast/bigtoast.github.com/repo")))
+publishMavenStyle := true
+
+publishTo := Some("Artifactory" at "http://artifactory.unbound.se/artifactory/plugins-release-local")

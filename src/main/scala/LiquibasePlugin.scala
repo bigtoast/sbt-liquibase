@@ -61,8 +61,7 @@ object LiquibasePlugin extends Plugin {
 
   liquibaseDatabase <<= (liquibaseUrl, liquibaseUsername, liquibasePassword, liquibaseDriver, liquibaseDefaultSchemaName, fullClasspath in Runtime ) map {
     (url :String, uname :String, pass :String, driver :String, schemaName :String, cpath ) =>
-      //CommandLineUtils.createDatabaseObject( ClasspathUtilities.toLoader(cpath.map(_.data)) ,url, uname, pass, driver, schemaName, null,null)
-      CommandLineUtils.createDatabaseObject( ClasspathUtilities.toLoader(cpath.map(_.data)) ,url, uname, pass, driver, null, null,null)
+      CommandLineUtils.createDatabaseObject( ClasspathUtilities.toLoader(cpath.map(_.data)) ,url, uname, pass, driver, null, null, false, false, null, null, null, null, null, null, null)
   },
 
   liquibase <<= ( liquibaseChangelog, liquibaseDatabase, liquibaseUseClasspathLoader, fullClasspath in Runtime ) map {
@@ -84,7 +83,7 @@ object LiquibasePlugin extends Plugin {
         liquibase.update(context, out.text())
     },
 
-    liquibaseStatus <<= liquibase map { _.reportStatus(true, null, new LoggerWriter( ConsoleLogger() ) ) },
+    liquibaseStatus <<= liquibase map { _.reportStatus(true, null.asInstanceOf[String], new LoggerWriter( ConsoleLogger() ) ) },
     liquibaseClearChecksums <<= liquibase map { _.clearCheckSums() },
     liquibaseListLocks <<= (streams, liquibase) map { (out, lbase) => lbase.reportLocks( new PrintStream(out.binary()) )  },
     liquibaseReleaseLocks <<= (streams, liquibase) map { (out, lbase) => lbase.forceReleaseLocks() },
@@ -95,7 +94,7 @@ object LiquibasePlugin extends Plugin {
 
     liquibaseRollback <<= inputTask { (argTask) =>
       ( streams, liquibase, argTask ) map { ( out, lbase, args :Seq[String] ) =>
-        lbase.rollback( args.head , null )
+        lbase.rollback( args.head , null.asInstanceOf[String] )
         out.log("Rolled back to tag %s".format(args.head))
       }
     },
@@ -109,13 +108,13 @@ object LiquibasePlugin extends Plugin {
 
     liquibaseRollbackSql <<= inputTask { (argTask) =>
       ( streams, liquibase, argTask ) map { ( out, lbase, args :Seq[String] ) =>
-        lbase.rollback( args.head , null, out.text() )
+        lbase.rollback( args.head , null.asInstanceOf[String], out.text() )
       }
     },
 
     liquibaseRollbackCountSql <<= inputTask { (argTask) =>
       ( streams, liquibase, argTask ) map { ( out, lbase, args :Seq[String] ) =>
-        lbase.rollback( args.head.toInt , null, out.text() )
+        lbase.rollback( args.head.toInt , null.asInstanceOf[String], out.text() )
       }
     },
 
@@ -145,8 +144,7 @@ object LiquibasePlugin extends Plugin {
     },
 
     liquibaseGenerateChangelog <<= (streams, liquibase, liquibaseChangelog, liquibaseDefaultSchemaName, baseDirectory) map { (out, lbase, clog, sname, bdir) =>
-      //CommandLineUtils.doGenerateChangeLog(clog, lbase.getDatabase(), sname, null,null,null, bdir / "src" / "main" / "migrations" absolutePath )
-      CommandLineUtils.doGenerateChangeLog(clog, lbase.getDatabase(), null, null,null,null, bdir / "src" / "main" / "migrations" absolutePath )
+      CommandLineUtils.doGenerateChangeLog(clog, lbase.getDatabase(), null, null,null,null, null, bdir / "src" / "main" / "migrations" absolutePath, null)
     },
 
     liquibaseChangelogSyncSql <<= (streams, liquibase ) map { ( out, lbase) =>
@@ -155,6 +153,4 @@ object LiquibasePlugin extends Plugin {
 
     liquibaseDropAll <<= liquibase map { _.dropAll() }
   )
-
-
 }
