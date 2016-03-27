@@ -5,12 +5,11 @@ import sbt._
 import classpath._
 import Process._
 import Keys._
-
 import java.io.{File, PrintStream}
 import java.text.SimpleDateFormat
 
 import liquibase.integration.commandline.CommandLineUtils
-import liquibase.resource.FileSystemResourceAccessor
+import liquibase.resource.{ClassLoaderResourceAccessor, FileSystemResourceAccessor}
 import liquibase.database.Database
 import liquibase.Liquibase
 
@@ -46,6 +45,7 @@ object LiquibasePlugin extends Plugin {
   val liquibaseDriver    = SettingKey[String]("liquibase-driver", "driver")
   val liquibaseDefaultSchemaName = SettingKey[String]("liquibase-default-schema-name","default schema name")
   val liquibaseContext = SettingKey[String]("liquibase-context","changeSet contexts to execute")
+  val liquibaseUseClasspathLoader = SettingKey[Boolean]("liquibase-use-classpath-loader", "Use Classloader resource for changelog")
 
   lazy val liquibaseDatabase = TaskKey[Database]("liquibase-database", "the database")
   lazy val liquibase = TaskKey[Liquibase]("liquibase", "liquibase object")
@@ -54,6 +54,7 @@ object LiquibasePlugin extends Plugin {
     liquibaseDefaultSchemaName := "liquischema",
     liquibaseChangelog := "src/main/migrations/changelog.xml",
     liquibaseContext := "",
+    liquibaseUseClasspathLoader := false,
     //changelog <<= baseDirectory( _ / "src" / "main" / "migrations" /  "changelog.xml" absolutePath ),
 
 
@@ -63,9 +64,13 @@ object LiquibasePlugin extends Plugin {
       CommandLineUtils.createDatabaseObject( ClasspathUtilities.toLoader(cpath.map(_.data)) ,url, uname, pass, driver, null, null,null)
   },
 
-  liquibase <<= ( liquibaseChangelog, liquibaseDatabase ) map {
-    ( cLog :String, dBase :Database ) =>
-      new Liquibase( cLog, new FileSystemResourceAccessor, dBase )
+  liquibase <<= ( liquibaseChangelog, liquibaseDatabase, liquibaseUseClasspathLoader, fullClasspath in Runtime ) map {
+    ( cLog :String, dBase :Database, useCpathLoader, cpath ) =>
+      if (useCpathLoader.booleanValue()) {
+        new Liquibase(cLog, new ClassLoaderResourceAccessor(ClasspathUtilities.toLoader(cpath.map(_.data))), dBase)
+      } else {
+        new Liquibase(cLog, new FileSystemResourceAccessor, dBase)
+      }
   },
 
     liquibaseUpdate <<= (liquibase, liquibaseContext) map {
