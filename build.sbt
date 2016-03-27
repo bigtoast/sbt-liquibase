@@ -5,9 +5,9 @@ organization := "com.github.bigtoast"
 
 name := "sbt-liquibase"
 
-version := "0.5"
+version := "0.6"
 
-crossScalaVersions := Seq("2.9.2", "2.10.0")
+crossScalaVersions := Seq("2.11.0")
 
 libraryDependencies += "org.liquibase" % "liquibase-core" % "2.0.5"
 
